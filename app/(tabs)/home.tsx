@@ -10,7 +10,7 @@ export default function HomeScreen() {
     <ScrollView>
       <Header />
       <View style={styles.contentContainer}>
-        <Button title="Welcome" onPress={() => router.replace('/welcome')} />
+        <Button title="Welcome" onPress={() => router.replace('/')} />
       </View>
     </ScrollView>
   );

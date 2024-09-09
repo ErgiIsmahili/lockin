@@ -16,10 +16,10 @@ export default function Login() {
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ email: "ergi@gmail.com", password: "ergi123" }}
         onSubmit={
           (values) => {console.log(values);
-          router.push("/(tabs)");
+          router.replace("../home");
         }}
         validationSchema={validationSchema}
       >
@@ -57,8 +57,8 @@ export default function Login() {
               <Text style={styles.errorText}>{errors.password}</Text>
             )}
 
-            <TouchableOpacity style={styles.button} onPress={()=>handleSubmit}>
-              <Text style={styles.buttonText}>Sign In</Text>
+            <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+              <Text style={styles.buttonText}>Sign in</Text>
             </TouchableOpacity>
           </View>
         )}

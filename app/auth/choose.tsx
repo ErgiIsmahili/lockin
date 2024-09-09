@@ -7,7 +7,6 @@ export default function Choose() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the App</Text>
       <Button title="Register" onPress={() => router.replace('/auth/register')} />
       <Button title="Sign In" onPress={() => router.replace('/auth/login')} />
     </View>

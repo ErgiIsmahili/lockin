@@ -20,10 +20,11 @@ export default function Register() {
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
       <Formik
-        initialValues={{ email: "", password: "", confirmPassword: "" }}
+        initialValues={{ email: "ergi@gmail.com", password: "ergi123", confirmPassword: "ergi123" }}
         onSubmit={
           (values) => {console.log(values);
-          router.push("/(tabs)");
+          
+          router.replace("../home");
         }}
         validationSchema={validationSchema}
       >
