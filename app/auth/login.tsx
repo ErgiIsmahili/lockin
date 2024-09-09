@@ -17,7 +17,10 @@ export default function Login() {
       <Text style={styles.title}>Login</Text>
       <Formik
         initialValues={{ email: "", password: "" }}
-        onSubmit={(values) => console.log(values)}
+        onSubmit={
+          (values) => {console.log(values);
+          router.push("/(tabs)");
+        }}
         validationSchema={validationSchema}
       >
         {({
