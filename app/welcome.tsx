@@ -8,7 +8,7 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the App</Text>
-      <Button title="Get Started" onPress={() => router.replace('/choose')} />
+      <Button title="Get Started" onPress={() => router.replace('/auth/choose')} />
     </View>
   );
 }
