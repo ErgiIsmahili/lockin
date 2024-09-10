@@ -3,6 +3,8 @@ import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity } from 'rea
 import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { useMutation } from '@tanstack/react-query';
+import { registerUser } from "../(services)/api/api";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required("Email is required").email().label("Email"),
@@ -15,16 +17,25 @@ const validationSchema = Yup.object().shape({
 
 export default function Register() {
   const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: registerUser,
+    mutationKey: ['register'],
+  });
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
       <Formik
         initialValues={{ email: "ergi@gmail.com", password: "ergi123", confirmPassword: "ergi123" }}
-        onSubmit={
-          (values) => {console.log(values);
-          
-          router.replace("../home");
+        onSubmit={(values) => {
+          mutation.mutateAsync(values)
+            .then((data) => {
+              console.log("Registration success:", data);
+              router.replace("../home");
+            })
+            .catch((error) => {
+              console.log("Registration error:", error);
+            });
         }}
         validationSchema={validationSchema}
       >

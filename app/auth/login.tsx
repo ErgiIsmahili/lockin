@@ -3,6 +3,8 @@ import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity } from 'rea
 import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { useMutation } from '@tanstack/react-query';
+import { loginUser } from "../(services)/api/api"
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required("Email is required").email().label("Email"),
@@ -11,58 +13,70 @@ const validationSchema = Yup.object().shape({
 
 export default function Login() {
   const router = useRouter();
-
+  const mutation = useMutation({
+    mutationFn: loginUser,
+    mutationKey:['login'],
+  }) 
+  console.log("mutation", mutation)
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <Formik
-        initialValues={{ email: "ergi@gmail.com", password: "ergi123" }}
-        onSubmit={
-          (values) => {console.log(values);
-          router.replace("../home");
-        }}
-        validationSchema={validationSchema}
-      >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
-          <View style={styles.form}>
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              onChangeText={handleChange("email")}
-              onBlur={handleBlur("email")}
-              value={values.email}
-              keyboardType="email-address"
-              placeholderTextColor="#888"
-            />
-            {errors.email && touched.email && (
-              <Text style={styles.errorText}>{errors.email}</Text>
-            )}
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              onChangeText={handleChange("password")}
-              onBlur={handleBlur("password")}
-              value={values.password}
-              secureTextEntry
-              placeholderTextColor="#888"
-            />
-            {errors.password && touched.password && (
-              <Text style={styles.errorText}>{errors.password}</Text>
-            )}
+  initialValues={{ email: "ergi@gmail.com", password: "ergi123" }}
+  onSubmit={(values) => {
+    console.log("Form values:", values);
+    mutation.mutateAsync(values)
+      .then((data) => {
+        console.log("Login success:", data);  // Handle success, like navigating to another page
+        router.replace("../home");  // Uncomment to navigate after successful login
+      })
+      .catch((error) => {
+        console.log("Login error:", error);  // Handle error
+      });
+  }}
+  validationSchema={validationSchema}
+>
+  {({
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    values,
+    errors,
+    touched,
+  }) => (
+    <View style={styles.form}>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        onChangeText={handleChange("email")}
+        onBlur={handleBlur("email")}
+        value={values.email}
+        keyboardType="email-address"
+        placeholderTextColor="#888"
+      />
+      {errors.email && touched.email && (
+        <Text style={styles.errorText}>{errors.email}</Text>
+      )}
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        onChangeText={handleChange("password")}
+        onBlur={handleBlur("password")}
+        value={values.password}
+        secureTextEntry
+        placeholderTextColor="#888"
+      />
+      {errors.password && touched.password && (
+        <Text style={styles.errorText}>{errors.password}</Text>
+      )}
 
-            <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Sign in</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </Formik>
+      <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+        <Text style={styles.buttonText}>Sign in</Text>
+      </TouchableOpacity>
+    </View>
+  )}
+</Formik>
+
 
       <Button title="Register" onPress={() => router.replace('/auth/register')} />
     </View>
