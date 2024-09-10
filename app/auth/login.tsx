@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -20,6 +20,11 @@ export default function Login() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
+      {mutation?.isError && (
+        <Text style={styles.errorText}>
+          {mutation?.error?.message}
+          </Text>
+      )}
       <Formik
   initialValues={{ email: "ergi@gmail.com", password: "ergi123" }}
   onSubmit={(values) => {
@@ -68,8 +73,16 @@ export default function Login() {
         <Text style={styles.errorText}>{errors.password}</Text>
       )}
 
-      <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={() => handleSubmit()}
+        disabled={mutation?.isPending}  
+      >
+        {mutation?.isPending ? (
+          <ActivityIndicator color='#fff'/>
+        ) : (
         <Text style={styles.buttonText}>Sign in</Text>
+      )}
       </TouchableOpacity>
     </View>
   )}

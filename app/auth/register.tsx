@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -25,6 +25,11 @@ export default function Register() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
+      {mutation?.isError && (
+        <Text style={styles.errorText}>
+          {mutation?.error?.message}
+          </Text>
+      )}
       <Formik
         initialValues={{ email: "ergi@gmail.com", password: "ergi123", confirmPassword: "ergi123" }}
         onSubmit={(values) => {
@@ -85,9 +90,17 @@ export default function Register() {
               <Text style={styles.errorText}>{errors.confirmPassword}</Text>
             )}
 
-            <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Register</Text>
-            </TouchableOpacity>
+          <TouchableOpacity 
+                  style={styles.button} 
+                  onPress={() => handleSubmit()}
+                  disabled={mutation?.isPending}  
+                >
+                  {mutation?.isPending ? (
+                    <ActivityIndicator color='#fff'/>
+                  ) : (
+                  <Text style={styles.buttonText}>Register</Text>
+                )}
+                </TouchableOpacity>
           </View>
         )}
       </Formik>
