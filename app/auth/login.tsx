@@ -17,21 +17,19 @@ export default function Login() {
     mutationFn: loginUser,
     mutationKey:['login'],
   }) 
-  console.log("mutation", mutation)
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <Formik
   initialValues={{ email: "ergi@gmail.com", password: "ergi123" }}
   onSubmit={(values) => {
-    console.log("Form values:", values);
     mutation.mutateAsync(values)
       .then((data) => {
-        console.log("Login success:", data);  // Handle success, like navigating to another page
-        router.replace("../home");  // Uncomment to navigate after successful login
+        console.log("Login success:", data);
+        router.replace("../home"); 
       })
       .catch((error) => {
-        console.log("Login error:", error);  // Handle error
+        console.log("Login error:", error); 
       });
   }}
   validationSchema={validationSchema}
