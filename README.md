@@ -21,7 +21,5 @@ or
     npx expo start
    '''
 
-3. create local tunnel 
+3. create local tunnel and use VSCode extension Thunder Client to test API
    npx localtunnel --port 8000
-
-4. Get Thunder Client to test API
