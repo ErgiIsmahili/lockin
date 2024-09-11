@@ -2,7 +2,7 @@ import axios from "axios";
 
 const loginUser = async ({email, password}) => {
     const response = await axios.post(
-        "https://calm-papayas-fly.loca.lt/api/users/login",
+        "https://brown-points-lay.loca.lt/api/users/login",
         {
             email,
             password
@@ -13,7 +13,7 @@ const loginUser = async ({email, password}) => {
 
 const registerUser = async ({email, password}) => {
     const response = await axios.post(
-        "https://calm-papayas-fly.loca.lt/api/users/register",
+        "https://brown-points-lay.loca.lt/api/users/register",
         {
             email,
             password
