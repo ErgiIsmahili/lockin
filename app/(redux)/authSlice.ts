@@ -10,6 +10,7 @@ export interface User {
 
 interface AuthState {
   user: User | null;
+  isLoading: boolean;
 }
 
 const loadUserFromStorage = async (): Promise<User | null> => {
@@ -23,6 +24,7 @@ const loadUserFromStorage = async (): Promise<User | null> => {
 
 const initialState: AuthState = {
   user: null,
+  isLoading: true,
 };
 
 const authSlice = createSlice({
@@ -31,14 +33,17 @@ const authSlice = createSlice({
   reducers: {
     loginUserAction: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
+      state.isLoading = false;
       AsyncStorage.setItem("userInfo", JSON.stringify(action.payload));
     },
     logoutUserAction: (state) => {
       state.user = null;
+      state.isLoading = false;
       AsyncStorage.removeItem("userInfo");
     },
     setUserAction: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
+      state.isLoading = false;
     },
   },
 });
