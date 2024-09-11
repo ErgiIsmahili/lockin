@@ -4,7 +4,9 @@ import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useMutation } from '@tanstack/react-query';
-import { loginUser } from "../(services)/api/api"
+import { loginUser } from "../(services)/api/api";
+import { loginUserAction } from "../(redux)/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required("Email is required").email().label("Email"),
@@ -17,6 +19,10 @@ export default function Login() {
     mutationFn: loginUser,
     mutationKey:['login'],
   }) 
+
+  const dispatch = useDispatch();
+
+  useSelector((state) => console.log("Store data", state))
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -25,68 +31,69 @@ export default function Login() {
           {mutation?.error?.message}
           </Text>
       )}
-      <Formik
-  initialValues={{ email: "ergi@gmail.com", password: "ergi123" }}
-  onSubmit={(values) => {
-    mutation.mutateAsync(values)
-      .then((data) => {
-        console.log("Login success:", data);
-        router.replace("../home"); 
-      })
-      .catch((error) => {
-        console.log("Login error:", error); 
-      });
-  }}
-  validationSchema={validationSchema}
->
-  {({
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    values,
-    errors,
-    touched,
-  }) => (
-    <View style={styles.form}>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        onChangeText={handleChange("email")}
-        onBlur={handleBlur("email")}
-        value={values.email}
-        keyboardType="email-address"
-        placeholderTextColor="#888"
-      />
-      {errors.email && touched.email && (
-        <Text style={styles.errorText}>{errors.email}</Text>
-      )}
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        onChangeText={handleChange("password")}
-        onBlur={handleBlur("password")}
-        value={values.password}
-        secureTextEntry
-        placeholderTextColor="#888"
-      />
-      {errors.password && touched.password && (
-        <Text style={styles.errorText}>{errors.password}</Text>
-      )}
+    <Formik
+      initialValues={{ email: "ergi@gmail.com", password: "ergi123" }}
+      onSubmit={(values) => {
+        mutation
+          .mutateAsync(values)
+          .then((data) => {
+            dispatch(loginUserAction(data))
+            router.replace("../home"); 
+          })
+          .catch((error) => {
+            console.log("Login error:", error); 
+          });
+      }}
+      validationSchema={validationSchema}
+    >
+      {({
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+      }) => (
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            onChangeText={handleChange("email")}
+            onBlur={handleBlur("email")}
+            value={values.email}
+            keyboardType="email-address"
+            placeholderTextColor="#888"
+          />
+          {errors.email && touched.email && (
+            <Text style={styles.errorText}>{errors.email}</Text>
+          )}
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            onChangeText={handleChange("password")}
+            onBlur={handleBlur("password")}
+            value={values.password}
+            secureTextEntry
+            placeholderTextColor="#888"
+          />
+          {errors.password && touched.password && (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          )}
 
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => handleSubmit()}
-        disabled={mutation?.isPending}  
-      >
-        {mutation?.isPending ? (
-          <ActivityIndicator color='#fff'/>
-        ) : (
-        <Text style={styles.buttonText}>Sign in</Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => handleSubmit()}
+            disabled={mutation?.isPending}  
+          >
+            {mutation?.isPending ? (
+              <ActivityIndicator color='#fff'/>
+            ) : (
+            <Text style={styles.buttonText}>Sign in</Text>
+          )}
+          </TouchableOpacity>
+        </View>
       )}
-      </TouchableOpacity>
-    </View>
-  )}
-</Formik>
+    </Formik>
 
 
       <Button title="Register" onPress={() => router.replace('/auth/register')} />
