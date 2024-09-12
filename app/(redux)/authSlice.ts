@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "./store"; // import your store's dispatch type
 
@@ -13,11 +13,14 @@ interface AuthState {
   isLoading: boolean;
 }
 
+const USER_INFO_KEY = "userInfo";
+
 const loadUserFromStorage = async (): Promise<User | null> => {
   try {
-    const userInfo = await AsyncStorage.getItem("userInfo");
+    const userInfo = await AsyncStorage.getItem(USER_INFO_KEY);
     return userInfo ? JSON.parse(userInfo) : null;
   } catch (error) {
+    console.error("Failed to load user from storage", error);
     return null;
   }
 };
@@ -34,14 +37,18 @@ const authSlice = createSlice({
     loginUserAction: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isLoading = false;
-      AsyncStorage.setItem("userInfo", JSON.stringify(action.payload));
+      AsyncStorage.setItem(USER_INFO_KEY, JSON.stringify(action.payload)).catch((error) => {
+        console.error("Failed to save user to storage", error);
+      });
     },
     logoutUserAction: (state) => {
       state.user = null;
       state.isLoading = false;
-      AsyncStorage.removeItem("userInfo");
+      AsyncStorage.removeItem(USER_INFO_KEY).catch((error) => {
+        console.error("Failed to remove user from storage", error);
+      });
     },
-    setUserAction: (state, action: PayloadAction<User>) => {
+    setUserAction: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
       state.isLoading = false;
     },
@@ -52,8 +59,11 @@ export const { loginUserAction, logoutUserAction, setUserAction } = authSlice.ac
 export default authSlice.reducer;
 
 export const loadUser = () => async (dispatch: AppDispatch) => {
-  const userInfo = await loadUserFromStorage();
-  if (userInfo) {
-    dispatch(setUserAction(userInfo));
+  try {
+    const userInfo = await loadUserFromStorage();
+    dispatch(setUserAction(userInfo)); // Correctly handle both User and null
+  } catch (error) {
+    console.error("Failed to load user", error);
+    dispatch(setUserAction(null)); // Ensure that null is handled
   }
 };

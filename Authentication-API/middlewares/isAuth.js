@@ -1,24 +1,42 @@
+require('dotenv').config();
 const jwt = require("jsonwebtoken");
-const isAuthenticated = async (req, res, next) => {
-  //! Get the token from the header
-  const headerObj = req.headers;
-  const token = headerObj.authorization.split(" ")[1];
+const User = require("../model/User");
 
-  //Verify token
-  const verifyToken = jwt.verify(token, "anyKey", (err, decoded) => {
-    if (err) {
-      return false;
-    } else {
-      return decoded;
+const isAuthenticated = async (req, res, next) => {
+  // Check if the authorization header is present
+  const authHeader = req.headers.authorization;
+  const token1 = authHeader.split(" ")[1];
+
+  console.log(req)
+  console.log(jwt.verify(token1, process.env.JWT_SECRET))
+  console.log(res)
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: "Authorization header is missing or invalid" });
+  }
+
+  // Check if the header starts with "Bearer "
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Token is missing" });
+  }
+
+  try {
+    // Verify the token
+    console.log('JWT Secret:', process.env.JWT_SECRET); // Temporary debug
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Find the user associated with the token
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
     }
-  });
-  if (verifyToken) {
-    //save the user into req.obj
-    req.user = verifyToken.id;
+
+    // Attach user to the request object
+    req.user = user;
+
     next();
-  } else {
-    const err = new Error("Token expired please login again");
-    next(err);
+  } catch (error) {
+    res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
