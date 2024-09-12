@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const baseURL = "https://loud-corners-count.loca.lt";
+const baseURL = "https://thick-masks-decide.loca.lt";
 const AUTH_TOKEN_KEY = 'authToken';
 
 const loginUser = async ({ email, password }: { email: string; password: string }) => {
@@ -30,21 +30,31 @@ const registerUser = async ({ username, email, password }: { username: string; e
   }
 };
 
-const createGroup = async ({ name }: { name: string }) => {
+interface CreateGroupData {
+  name: string;
+  image?: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  howManyDaysPerWeek?: number;
+  weeksPerMonth?: number;
+}
+
+const createGroup = async (data: CreateGroupData) => {
   try {
     const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) {
       throw new Error('No auth token found');
     }
+
     const response = await axios.post(
       `${baseURL}/api/groups`,
-      { name },
+      data,
       {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       }
     );
+
     return response.data;
   } catch (error) {
     throw error;

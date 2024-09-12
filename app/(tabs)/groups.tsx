@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
-import { createGroup } from '../(services)/api/api';
+import RNPickerSelect from 'react-native-picker-select';
+import { createGroup } from '../(services)/api/api'; // Adjusted import path
 import axios from 'axios';
 
 const CreateGroupScreen: React.FC = () => {
-    const [groupName, setGroupName] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [groupName, setGroupName] = useState<string>('');
+    const [image, setImage] = useState<string>('');
+    const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+    const [howManyDaysPerWeek, setHowManyDaysPerWeek] = useState<string>('');
+    const [howManyWeeksPerMonth, setWeeksPerMonth] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const frequencyOptions = [
+        { label: 'Daily', value: 'daily' },
+        { label: 'Weekly', value: 'weekly' },
+        { label: 'Monthly', value: 'monthly' },
+    ];
 
     const handleCreateGroup = async () => {
         if (groupName.trim() === '') {
@@ -13,17 +24,44 @@ const CreateGroupScreen: React.FC = () => {
             return;
         }
 
+        if (!frequency) {
+            Alert.alert('Validation Error', 'Frequency is required.');
+            return;
+        }
+
+        const daysPerWeek = Number(howManyDaysPerWeek);
+        const weeksPerMonth = Number(howManyWeeksPerMonth);
+
+        if ((frequency === 'weekly' && isNaN(daysPerWeek)) ||
+            (frequency === 'monthly' && isNaN(weeksPerMonth))) {
+            Alert.alert('Validation Error', 'Please enter valid numbers for selected frequency.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            const response = await createGroup({ name: groupName });
-            Alert.alert('Success', `Group created with ID: ${response.id}`);
+            const response = await createGroup({
+                name: groupName,
+                image,
+                frequency,
+                howManyDaysPerWeek: frequency === 'weekly' ? daysPerWeek : undefined,
+                weeksPerMonth: frequency === 'monthly' ? weeksPerMonth : undefined,
+            });
+            Alert.alert('Success', `Group created with ID: ${response._id}`);
             setGroupName('');
+            setImage('');
+            setFrequency('daily');
+            setHowManyDaysPerWeek('');
+            setWeeksPerMonth('');
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.error('Axios error:', error.response?.data || error.message);
+                Alert.alert('Error', 'Group creation failed.');
+            }
+        } finally {
+            setLoading(false);
         }
-    }
     };
 
     return (
@@ -35,6 +73,49 @@ const CreateGroupScreen: React.FC = () => {
                 onChangeText={setGroupName}
                 placeholder="Enter group name"
             />
+            
+            <Text style={styles.label}>Image URL:</Text>
+            <TextInput
+                style={styles.input}
+                value={image}
+                onChangeText={setImage}
+                placeholder="Enter image URL"
+            />
+
+            <Text style={styles.label}>Frequency:</Text>
+            <RNPickerSelect
+                onValueChange={(value) => setFrequency(value as 'daily' | 'weekly' | 'monthly')}
+                items={frequencyOptions}
+                style={pickerStyles}
+                value={frequency}
+            />
+
+            {frequency === 'weekly' && (
+                <>
+                    <Text style={styles.label}>How Many Days Per Week:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={howManyDaysPerWeek}
+                        onChangeText={setHowManyDaysPerWeek}
+                        placeholder="Enter number of days"
+                        keyboardType="numeric"
+                    />
+                </>
+            )}
+
+            {frequency === 'monthly' && (
+                <>
+                    <Text style={styles.label}>Weeks Per Month:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={howManyWeeksPerMonth}
+                        onChangeText={setWeeksPerMonth}
+                        placeholder="Enter number of weeks"
+                        keyboardType="numeric"
+                    />
+                </>
+            )}
+
             <Button
                 title={loading ? 'Creating...' : 'Create Group'}
                 onPress={handleCreateGroup}
@@ -55,6 +136,21 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        padding: 8,
+        marginBottom: 16,
+    },
+});
+
+const pickerStyles = StyleSheet.create({
+    inputIOS: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        padding: 8,
+        marginBottom: 16,
+    },
+    inputAndroid: {
         borderWidth: 1,
         borderColor: '#ccc',
         padding: 8,
