@@ -5,8 +5,11 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useMutation } from '@tanstack/react-query';
 import { registerUser } from "../(services)/api/api";
+import { loginUserAction } from '../(redux)/authSlice';
+import { useDispatch } from 'react-redux';
 
 const validationSchema = Yup.object().shape({
+  username: Yup.string().required("Username is required").label("Username"),
   email: Yup.string().required("Email is required").email().label("Email"),
   password: Yup.string().required("Password is required").min(4).label("Password"),
   confirmPassword: Yup.string()
@@ -22,20 +25,23 @@ export default function Register() {
     mutationKey: ['register'],
   });
 
+  const dispatch = useDispatch()
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
       {mutation?.isError && (
         <Text style={styles.errorText}>
           {mutation?.error?.message}
-          </Text>
+        </Text>
       )}
       <Formik
-        initialValues={{ email: "ergi@gmail.com", password: "ergi123", confirmPassword: "ergi123" }}
+        initialValues={{ username: 'ergi', email: 'ergi@gmail.com', password: 'ergi123', confirmPassword: 'ergi123' }}
         onSubmit={(values) => {
           mutation.mutateAsync(values)
             .then((data) => {
               console.log("Registration success:", data);
+              dispatch(loginUserAction(data))
               router.replace("../home");
             })
             .catch((error) => {
@@ -53,6 +59,17 @@ export default function Register() {
           touched,
         }) => (
           <View style={styles.form}>
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              onChangeText={handleChange("username")}
+              onBlur={handleBlur("username")}
+              value={values.username}
+              placeholderTextColor="#888"
+            />
+            {errors.username && touched.username && (
+              <Text style={styles.errorText}>{errors.username}</Text>
+            )}
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -90,17 +107,17 @@ export default function Register() {
               <Text style={styles.errorText}>{errors.confirmPassword}</Text>
             )}
 
-          <TouchableOpacity 
-                  style={styles.button} 
-                  onPress={() => handleSubmit()}
-                  disabled={mutation?.isPending}  
-                >
-                  {mutation?.isPending ? (
-                    <ActivityIndicator color='#fff'/>
-                  ) : (
-                  <Text style={styles.buttonText}>Register</Text>
-                )}
-                </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={() => handleSubmit()}
+              disabled={mutation?.isPending}
+            >
+              {mutation?.isPending ? (
+                <ActivityIndicator color='#fff'/>
+              ) : (
+                <Text style={styles.buttonText}>Register</Text>
+              )}
+            </TouchableOpacity>
           </View>
         )}
       </Formik>

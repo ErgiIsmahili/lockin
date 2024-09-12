@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const baseURL = "https://young-cycles-behave.loca.lt";
+const baseURL = "https://loud-corners-count.loca.lt";
 const AUTH_TOKEN_KEY = 'authToken';
 
 const loginUser = async ({ email, password }: { email: string; password: string }) => {
@@ -18,11 +18,11 @@ const loginUser = async ({ email, password }: { email: string; password: string 
   }
 };
 
-const registerUser = async ({ email, password }: { email: string; password: string }) => {
+const registerUser = async ({ username, email, password }: { username: string; email: string; password: string}) => {
   try {
     const response = await axios.post(
       `${baseURL}/api/users/register`,
-      { email, password }
+      { email, password , username}
     );
     return response.data;
   } catch (error) {
