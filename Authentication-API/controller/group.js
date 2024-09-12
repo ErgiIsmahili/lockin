@@ -3,7 +3,7 @@ const User = require("../model/User");
 
 exports.createGroup = async (req, res) => {
   const { name } = req.body;
-  const userId = req.user.id; // Assuming you're using an authentication middleware
+  const userId = req.user.id; 
 
   try {
     const group = new Group({ name, members: [userId] });
