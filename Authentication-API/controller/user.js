@@ -11,7 +11,7 @@ const userCtrl = {
     if (!email || !password || !username) {
       throw new Error("Please provide all required fields");
     }
-    
+
     const userExists = await User.findOne({ email });
     if (userExists) {
       throw new Error("User already exists");
@@ -19,18 +19,17 @@ const userCtrl = {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
+
     const userCreated = await User.create({
       password: hashedPassword,
       email,
-      username // Add this line
+      username
     });
 
-    console.log("userCreated", userCreated);
     res.json({
       username: userCreated.username,
       email: userCreated.email,
-      id: userCreated._id, // Changed to _id to match Mongoose default
+      id: userCreated._id,
     });
   }),
 
@@ -52,13 +51,28 @@ const userCtrl = {
       token,
       id: user._id,
       email: user.email,
-      username: user.username, // Add this line
+      username: user.username,
     });
   }),
 
   profile: asyncHandler(async (req, res) => {
     const user = await User.findById(req.user).select("-password");
     res.json({ user });
+  }),
+
+  getUserGroups: asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    try {
+      const user = await User.findById(userId).populate('groups');
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({ groups: user.groups });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to retrieve user's groups", error: error.message });
+    }
   }),
 };
 
