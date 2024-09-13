@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const baseURL = "https://crazy-cups-enjoy.loca.lt";
+const baseURL = "https://rude-apples-cough.loca.lt";
 const AUTH_TOKEN_KEY = 'authToken';
 
 const loginUser = async ({ email, password }: { email: string; password: string }) => {
@@ -61,4 +61,41 @@ const createGroup = async (data: CreateGroupData) => {
   }
 };
 
-export { loginUser, registerUser, createGroup };
+const getUserGroups = async () => {
+  try {
+    const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) {
+      throw new Error('No auth token found');
+    }
+
+    const url = `${baseURL}/api/users/groups`;
+    console.log('Fetching user groups from:', url);
+
+    const response = await axios.get(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      timeout: 10000,
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response data:', response.data);
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        config: error.config
+      });
+      throw new Error(`Request failed: ${error.response?.status} ${error.response?.data?.message || error.message}`);
+    } else {
+      console.error('Unexpected error:', error);
+      throw error;
+    }
+  }
+};
+
+export { loginUser, registerUser, createGroup, getUserGroups };
