@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import { createGroup } from '../(services)/api/api'; // Adjusted import path
+import { createGroup } from '../../(services)/api/api';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 
 const CreateGroupScreen: React.FC = () => {
+    const router = useRouter();
+    
     const [groupName, setGroupName] = useState<string>('');
     const [image, setImage] = useState<string>('');
     const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
@@ -54,6 +57,7 @@ const CreateGroupScreen: React.FC = () => {
             setFrequency('daily');
             setHowManyDaysPerWeek('');
             setWeeksPerMonth('');
+            router.replace('/(tabs)/groups/groupsScreen')
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.error('Axios error:', error.response?.data || error.message);
