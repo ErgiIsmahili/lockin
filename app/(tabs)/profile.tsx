@@ -13,9 +13,9 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-        <Text style={styles.title}>User Profile</Text>
         {user ? (
           <>
+            <Text style={styles.title}>{user.username}</Text>
             <Text style={styles.text}>Email: {user.email}</Text>
             <TouchableOpacity style={styles.button} onPress={handleLogout}>
               <Text style={styles.buttonText}>Logout</Text>
@@ -60,4 +60,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
