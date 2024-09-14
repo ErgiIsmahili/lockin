@@ -24,7 +24,7 @@ app.use(express.json()); // Parse incoming JSON data
 
 // Configure CORS globally
 const corsOptions = {
-  origin: ['http://localhost:8081', 'https://fast-laws-sit.loca.lt'],  // Allowed origins
+  origin: "*",  // Allowed origins
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true  // Allow credentials (cookies, etc.)
 };

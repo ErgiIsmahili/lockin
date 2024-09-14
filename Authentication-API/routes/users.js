@@ -14,6 +14,6 @@ router.get("/api/users/groups", isAuthenticated, userCtrl.getUserGroups);
 // Groups
 router.post("/api/groups", isAuthenticated, groupCtrl.createGroup);
 router.post("/api/groups/add", isAuthenticated, groupCtrl.addUserToGroup);
-router.get("/api/groups/:id", isAuthenticated, groupCtrl.getGroupById); // Add this line
+router.get("/api/groups/:id", isAuthenticated, groupCtrl.getGroupById); 
 
 module.exports = router;
