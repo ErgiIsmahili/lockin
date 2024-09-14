@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { getUserGroups } from '../../(services)/api/api';
@@ -30,12 +30,19 @@ const GroupsScreen: React.FC = () => {
 
     const groups = data?.groups || [];
 
+    const handleGroupPress = (group: Group) => {
+        router.push({
+            pathname: '/(tabs)/groups/[id]',
+            params: { id: group._id }
+        } as never);
+    };
+
     const renderGroupItem = ({ item }: { item: Group }) => (
-        <View style={styles.groupItem}>
+        <TouchableOpacity style={styles.groupItem} onPress={() => handleGroupPress(item)}>
             <Text style={styles.groupName}>{item.name}</Text>
             <Text>Frequency: {item.frequency}</Text>
             <Text>Streak: {item.streak}</Text>
-        </View>
+        </TouchableOpacity>
     );
 
     return (
@@ -52,7 +59,7 @@ const GroupsScreen: React.FC = () => {
             )}
             <Button
                 title="Create New Group"
-                onPress={() => router.replace('/(tabs)/groups/createGroup')}
+                onPress={() => router.push('/(tabs)/groups/createGroup')}
             />
         </View>
     );

@@ -57,3 +57,21 @@ exports.addUserToGroup = async (req, res) => {
     res.status(500).json({ message: "Error adding user to group", error: error.message });
   }
 };
+
+exports.getGroupById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const group = await Group.findById(id)
+      .populate('members', 'username')
+      .exec();
+
+    if (group) {
+      res.status(200).json(group);
+    } else {
+      res.status(404).json({ message: "Group not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching group", error: error.message });
+  }
+};
