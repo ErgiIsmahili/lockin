@@ -2,8 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = require("./routes/users");
 const errorHandler = require("./middlewares/errorHandler");
+const cors = require("cors");  // Import the cors middleware
 require('dotenv').config();
 const app = express();
+
 //! Connect to mongodb
 const dbUsername = process.env.MONGODB_USERNAME;
 const dbPassword = process.env.MONGODB_PASSWORD;
@@ -18,11 +20,22 @@ mongoose
   .catch((e) => console.log(e));
 
 //! Middlewares
-app.use(express.json()); //pass incoming json data from the user
-//!Routes
+app.use(express.json()); // Parse incoming JSON data
+
+// Configure CORS globally
+const corsOptions = {
+  origin: ['http://localhost:8081', 'https://fast-laws-sit.loca.lt'],  // Allowed origins
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true  // Allow credentials (cookies, etc.)
+};
+app.use(cors(corsOptions));  // Use CORS middleware
+
+//! Routes
 app.use("/", router);
-//!error handler
+
+//! Error handler
 app.use(errorHandler);
+
 //! Start the server
 const PORT = 8000;
-app.listen(PORT, console.log(`Server is up and running`));
+app.listen(PORT, () => console.log(`Server is up and running on port ${PORT}`));

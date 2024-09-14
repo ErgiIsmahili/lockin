@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const baseURL = "https://rude-apples-cough.loca.lt";
+const baseURL = "http://localhost:8000";
 const AUTH_TOKEN_KEY = 'authToken';
 
 const loginUser = async ({ email, password }: { email: string; password: string }) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Button, ScrollView } from 'react-native';
+import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import Header from '../../components/Header';
 
@@ -10,7 +10,7 @@ export default function HomeScreen() {
     <ScrollView>
       <Header />
       <View style={styles.contentContainer}>
-        <Button title="Welcome" onPress={() => router.replace('/')} />
+        <Text> Home </Text>
       </View>
     </ScrollView>
   );
