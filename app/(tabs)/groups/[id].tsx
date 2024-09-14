@@ -38,7 +38,7 @@ const GroupDetailsScreen: React.FC = () => {
             <Text>Streak: {group.streak}</Text>
             <Button
                 title="Back"
-                onPress={() => router.push('/groups/createGroup')} // Adjust path if needed
+                onPress={() => router.replace('/(tabs)/groups/groupsScreen')}
             />
         </View>
     );
