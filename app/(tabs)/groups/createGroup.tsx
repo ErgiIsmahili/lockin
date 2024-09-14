@@ -57,7 +57,7 @@ const CreateGroupScreen: React.FC = () => {
             setFrequency('daily');
             setHowManyDaysPerWeek('');
             setWeeksPerMonth('');
-            router.replace('/(tabs)/groups/groupsScreen')
+            router.replace('/(tabs)/groups/groupsScreen');
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.error('Axios error:', error.response?.data || error.message);
@@ -70,6 +70,8 @@ const CreateGroupScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
+            <Button title="Back" onPress={() => router.back()} />
+
             <Text style={styles.label}>Group Name:</Text>
             <TextInput
                 style={styles.input}
