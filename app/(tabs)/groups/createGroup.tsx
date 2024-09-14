@@ -70,7 +70,7 @@ const CreateGroupScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Button title="Back" onPress={() => router.back()} />
+            <Button title="Back" onPress={() => router.replace('/(tabs)/groups/groupsScreen')} />
 
             <Text style={styles.label}>Group Name:</Text>
             <TextInput

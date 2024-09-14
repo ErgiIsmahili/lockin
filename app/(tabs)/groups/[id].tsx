@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { getGroupById } from '../../(services)/api/api';
 
@@ -14,6 +14,7 @@ interface Group {
 
 const GroupDetailsScreen: React.FC = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
+    const router = useRouter();
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['group', id],
@@ -35,6 +36,10 @@ const GroupDetailsScreen: React.FC = () => {
             <Text style={styles.title}>{group.name}</Text>
             <Text>Frequency: {group.frequency}</Text>
             <Text>Streak: {group.streak}</Text>
+            <Button
+                title="Back"
+                onPress={() => router.push('/groups/createGroup')} // Adjust path if needed
+            />
         </View>
     );
 };
