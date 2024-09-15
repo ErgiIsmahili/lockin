@@ -3,6 +3,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const baseURL = "http://localhost:8000";
 const AUTH_TOKEN_KEY = 'authToken';
+const USER_ID_KEY = 'userId';
+
+interface User {
+  _id: string;
+  username: string;
+}
+
+interface CheckIn {
+  user: User;
+  date: string;
+  confirmed: boolean;
+}
+
+interface Group {
+  _id: string;
+  name: string;
+  frequency: string;
+  streak: number;
+  image: string;
+  checkIns: CheckIn[];
+  isCheckedInToday?: boolean;
+}
 
 const loginUser = async ({ email, password }: { email: string; password: string }) => {
   try {
@@ -10,10 +32,17 @@ const loginUser = async ({ email, password }: { email: string; password: string 
       `${baseURL}/api/users/login`,
       { email, password }
     );
-    const { token } = response.data;
-    await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
+    const { token, id } = response.data; 
+    if (token && id) {
+      await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
+      await AsyncStorage.setItem(USER_ID_KEY, id);
+      console.log('Stored user ID:', id);
+    } else {
+      console.error('Token or user ID (id) is missing in the response');
+    }
     return response.data;
   } catch (error) {
+    console.error('Error during login:', error);
     throw error;
   }
 };
@@ -120,7 +149,17 @@ const getUserGroups = async () => {
   }
 };
 
-const getGroupById = async (id: string) => {
+const getUserId = async (): Promise<string | null> => {
+  try {
+    const userId = await AsyncStorage.getItem(USER_ID_KEY);
+    return userId;
+  } catch (error) {
+    console.error('Error retrieving user ID from AsyncStorage:', error);
+    return null;
+  }
+};
+
+const getGroupById = async (id: string): Promise<Group> => {
   try {
     const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) {
@@ -128,19 +167,28 @@ const getGroupById = async (id: string) => {
     }
 
     const url = `${baseURL}/api/groups/${id}`;
-    console.log('Fetching group details from:', url);
 
-    const response = await axios.get(url, {
+    const response = await axios.get<Group>(url, {
       headers: {
         'Authorization': `Bearer ${token}`
       },
       timeout: 10000,
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response data:', response.data);
+    const data = response.data;
+    const today = new Date().toISOString().split('T')[0];
+    const userId = await getUserId();
 
-    return response.data;
+    if (userId) {
+      data.isCheckedInToday = data.checkIns.some((checkIn: CheckIn) =>
+        checkIn.user._id === userId && checkIn.date.split('T')[0] === today
+      );
+    } else {
+      console.warn('User ID not found');
+      data.isCheckedInToday = false;
+    }
+
+    return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error('Axios error:', {
@@ -149,10 +197,10 @@ const getGroupById = async (id: string) => {
         data: error.response?.data,
         config: error.config
       });
-      throw new Error(`Request failed: ${error.response?.status} ${error.response?.data?.message || error.message}`);
+      throw new Error(`Failed to fetch group details: ${error.response?.status} ${error.response?.data?.message || error.message}`);
     } else {
       console.error('Unexpected error:', error);
-      throw error;
+      throw new Error('An unexpected error occurred');
     }
   }
 };

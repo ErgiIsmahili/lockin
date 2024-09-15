@@ -10,6 +10,7 @@ interface Group {
   frequency: string;
   streak: number;
   image: string;
+  isCheckedInToday: boolean;
 }
 
 const GroupDetailsScreen: React.FC = () => {
@@ -17,15 +18,17 @@ const GroupDetailsScreen: React.FC = () => {
     const router = useRouter();
     const queryClient = useQueryClient();
 
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isLoading, isError, error, refetch } = useQuery({
         queryKey: ['group', id],
         queryFn: () => getGroupById(id),
+        enabled: !!id,
     });
-
+    console.log(data)
     const mutation = useMutation({
         mutationFn: () => checkIn(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['group', id] });
+            refetch(); 
+            Alert.alert('Success', 'You have successfully checked in!');
         },
         onError: (err: Error) => {
             Alert.alert('Error', err.message);
@@ -51,10 +54,13 @@ const GroupDetailsScreen: React.FC = () => {
                 title="Back"
                 onPress={() => router.replace('/(tabs)/groups/groupsScreen')}
             />
+            <Text style={styles.checkInStatus}>
+                Check-in Status: {group.isCheckedInToday ? 'Checked In' : 'Not Checked In'}
+            </Text>
             <Button
                 title="Check In"
                 onPress={() => mutation.mutate()}
-                disabled={mutation.status === 'pending'} 
+                disabled={group.isCheckedInToday || mutation.status === 'pending'}
             />
         </View>
     );
@@ -69,6 +75,12 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+    },
+    checkInStatus: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginVertical: 10,
+        color: 'blue',
     },
 });
 
