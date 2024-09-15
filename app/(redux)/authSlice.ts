@@ -1,13 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppDispatch } from "./store"; // import your store's dispatch type
+import { AppDispatch } from "./store"; 
 
 export interface User {
   id: string;
   name: string;
   email: string;
   username: string;
-  image?: string; // New field, optional as it might not always be present
+  image?: string;
 }
 
 interface AuthState {
