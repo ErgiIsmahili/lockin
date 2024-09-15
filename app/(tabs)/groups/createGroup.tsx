@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, Alert, Image } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import { createGroup } from '../../(services)/api/api';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 
 const CreateGroupScreen: React.FC = () => {
     const router = useRouter();
     
     const [groupName, setGroupName] = useState<string>('');
-    const [image, setImage] = useState<string>('');
+    const [image, setImage] = useState<string | null>(null);
     const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'monthly'>('daily');
     const [howManyDaysPerWeek, setHowManyDaysPerWeek] = useState<string>('');
     const [howManyWeeksPerMonth, setWeeksPerMonth] = useState<string>('');
@@ -20,6 +21,19 @@ const CreateGroupScreen: React.FC = () => {
         { label: 'Weekly', value: 'weekly' },
         { label: 'Monthly', value: 'monthly' },
     ];
+
+    const pickImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    };
 
     const handleCreateGroup = async () => {
         if (groupName.trim() === '') {
@@ -46,14 +60,14 @@ const CreateGroupScreen: React.FC = () => {
         try {
             const response = await createGroup({
                 name: groupName,
-                image,
+                image: image || '',
                 frequency,
                 howManyDaysPerWeek: frequency === 'weekly' ? daysPerWeek : undefined,
                 weeksPerMonth: frequency === 'monthly' ? weeksPerMonth : undefined,
             });
             Alert.alert('Success', `Group created with ID: ${response._id}`);
             setGroupName('');
-            setImage('');
+            setImage(null);
             setFrequency('daily');
             setHowManyDaysPerWeek('');
             setWeeksPerMonth('');
@@ -80,13 +94,9 @@ const CreateGroupScreen: React.FC = () => {
                 placeholder="Enter group name"
             />
             
-            <Text style={styles.label}>Image URL:</Text>
-            <TextInput
-                style={styles.input}
-                value={image}
-                onChangeText={setImage}
-                placeholder="Enter image URL"
-            />
+            <Text style={styles.label}>Group Image:</Text>
+            <Button title="Pick an image" onPress={pickImage} />
+            {image && <Image source={{ uri: image }} style={styles.image} />}
 
             <Text style={styles.label}>Frequency:</Text>
             <RNPickerSelect
@@ -145,6 +155,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         padding: 8,
+        marginBottom: 16,
+    },
+    image: {
+        width: 200,
+        height: 200,
+        resizeMode: 'contain',
         marginBottom: 16,
     },
 });
