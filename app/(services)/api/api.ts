@@ -157,4 +157,41 @@ const getGroupById = async (id: string) => {
   }
 };
 
-export { loginUser, registerUser, updateUserProfile, createGroup, getUserGroups, getGroupById };
+const checkIn = async (groupId: string) => {
+  try {
+    const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) {
+      throw new Error('No auth token found');
+    }
+
+    const url = `${baseURL}/api/groups/${groupId}/checkin`;
+    console.log('Sending check-in request to:', url);
+
+    const response = await axios.post(url, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      timeout: 10000,
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response data:', response.data);
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        config: error.config
+      });
+      throw new Error(`Check-in failed: ${error.response?.status} ${error.response?.data?.message || error.message}`);
+    } else {
+      console.error('Unexpected error:', error);
+      throw error;
+    }
+  }
+};
+
+export { loginUser, registerUser, updateUserProfile, createGroup, getUserGroups, getGroupById, checkIn };

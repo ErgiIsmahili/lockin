@@ -2,12 +2,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "./store"; 
 
+export interface Group {
+  id: string;
+  name: string;
+  image?: string;
+  frequency: string;
+  streak: number;
+}
+
+export interface CheckIn {
+  date: string;
+  confirmed: boolean;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   username: string;
   image?: string;
+  groups: Group[]; 
 }
 
 interface AuthState {
@@ -62,22 +76,49 @@ const authSlice = createSlice({
         });
       }
     },
+    updateGroupDataAction: (state, action: PayloadAction<Group[]>) => {
+      if (state.user) {
+        state.user.groups = action.payload; 
+        AsyncStorage.setItem(USER_INFO_KEY, JSON.stringify(state.user)).catch((error) => {
+          console.error("Failed to update user groups in storage", error);
+        });
+      }
+    },
+    updateCheckInAction: (state, action: PayloadAction<{ groupId: string; checkIn: CheckIn }>) => {
+      if (state.user) {
+        const group = state.user.groups.find(g => g.id === action.payload.groupId);
+        if (group) {
+        }
+      }
+    },
   },
 });
 
-export const { loginUserAction, logoutUserAction, setUserAction, updateUserAction } = authSlice.actions;
+export const { 
+  loginUserAction, 
+  logoutUserAction, 
+  setUserAction, 
+  updateUserAction, 
+  updateGroupDataAction, 
+  updateCheckInAction 
+} = authSlice.actions;
+
 export default authSlice.reducer;
 
 export const loadUser = () => async (dispatch: AppDispatch) => {
   try {
     const userInfo = await loadUserFromStorage();
-    dispatch(setUserAction(userInfo)); // Correctly handle both User and null
+    dispatch(setUserAction(userInfo));
   } catch (error) {
     console.error("Failed to load user", error);
-    dispatch(setUserAction(null)); // Ensure that null is handled
+    dispatch(setUserAction(null));
   }
 };
 
 export const updateUser = (updates: Partial<User>) => async (dispatch: AppDispatch) => {
   dispatch(updateUserAction(updates));
+};
+
+export const updateGroups = (groups: Group[]) => async (dispatch: AppDispatch) => {
+  dispatch(updateGroupDataAction(groups));
 };

@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import { getGroupById } from '../../(services)/api/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getGroupById, checkIn } from '../../(services)/api/api';
 
 interface Group {
   _id: string;
@@ -15,10 +15,21 @@ interface Group {
 const GroupDetailsScreen: React.FC = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['group', id],
         queryFn: () => getGroupById(id),
+    });
+
+    const mutation = useMutation({
+        mutationFn: () => checkIn(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['group', id] });
+        },
+        onError: (err: Error) => {
+            Alert.alert('Error', err.message);
+        },
     });
 
     if (isLoading) {
@@ -39,6 +50,11 @@ const GroupDetailsScreen: React.FC = () => {
             <Button
                 title="Back"
                 onPress={() => router.replace('/(tabs)/groups/groupsScreen')}
+            />
+            <Button
+                title="Check In"
+                onPress={() => mutation.mutate()}
+                disabled={mutation.status === 'pending'} 
             />
         </View>
     );
