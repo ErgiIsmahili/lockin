@@ -7,6 +7,7 @@ export interface User {
   name: string;
   email: string;
   username: string;
+  image?: string; // New field, optional as it might not always be present
 }
 
 interface AuthState {
@@ -53,10 +54,18 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isLoading = false;
     },
+    updateUserAction: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+        AsyncStorage.setItem(USER_INFO_KEY, JSON.stringify(state.user)).catch((error) => {
+          console.error("Failed to update user in storage", error);
+        });
+      }
+    },
   },
 });
 
-export const { loginUserAction, logoutUserAction, setUserAction } = authSlice.actions;
+export const { loginUserAction, logoutUserAction, setUserAction, updateUserAction } = authSlice.actions;
 export default authSlice.reducer;
 
 export const loadUser = () => async (dispatch: AppDispatch) => {
@@ -67,4 +76,8 @@ export const loadUser = () => async (dispatch: AppDispatch) => {
     console.error("Failed to load user", error);
     dispatch(setUserAction(null)); // Ensure that null is handled
   }
+};
+
+export const updateUser = (updates: Partial<User>) => async (dispatch: AppDispatch) => {
+  dispatch(updateUserAction(updates));
 };

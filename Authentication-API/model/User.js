@@ -4,8 +4,9 @@ const userSchema = new mongoose.Schema(
   {
     email: { type: String, required: true },
     password: { type: String, required: true },
-    username: { type: String, required: true, unique: true }, // Add this line
-    groups: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }]
+    username: { type: String, required: true, unique: true },
+    groups: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }],
+    image: {type: String},
   },
   {
     timestamps: true,

@@ -18,11 +18,33 @@ const loginUser = async ({ email, password }: { email: string; password: string 
   }
 };
 
-const registerUser = async ({ username, email, password }: { username: string; email: string; password: string }) => {
+const registerUser = async ({ username, email, password, image }: { username: string; email: string; password: string; image?: string }) => {
   try {
     const response = await axios.post(
       `${baseURL}/api/users/register`,
-      { email, password, username }
+      { email, password, username, image }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateUserProfile = async ({ username, image }: { username?: string; image?: string }) => {
+  try {
+    const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) {
+      throw new Error('No auth token found');
+    }
+
+    const response = await axios.put(
+      `${baseURL}/api/users/profile`,
+      { username, image },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
     );
     return response.data;
   } catch (error) {
@@ -135,4 +157,4 @@ const getGroupById = async (id: string) => {
   }
 };
 
-export { loginUser, registerUser, createGroup, getUserGroups, getGroupById };
+export { loginUser, registerUser, updateUserProfile, createGroup, getUserGroups, getGroupById };

@@ -10,7 +10,7 @@ const groupSchema = new mongoose.Schema({
     ref: 'User' 
   }],
   image: {
-    type: String,  // URL or path to the image
+    type: String,
   },
   frequency: {
     type: String,

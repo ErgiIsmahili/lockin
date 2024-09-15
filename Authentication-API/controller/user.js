@@ -6,7 +6,7 @@ const User = require("../model/User");
 
 const userCtrl = {
   register: asyncHandler(async (req, res) => {
-    const { email, password, username } = req.body;
+    const { email, password, username, image } = req.body;
 
     if (!email || !password || !username) {
       throw new Error("Please provide all required fields");
@@ -23,13 +23,15 @@ const userCtrl = {
     const userCreated = await User.create({
       password: hashedPassword,
       email,
-      username
+      username,
+      image
     });
 
     res.json({
       username: userCreated.username,
       email: userCreated.email,
       id: userCreated._id,
+      image: userCreated.image,
     });
   }),
 
@@ -52,6 +54,7 @@ const userCtrl = {
       id: user._id,
       email: user.email,
       username: user.username,
+      image: user.image,
     });
   }),
 
@@ -72,6 +75,30 @@ const userCtrl = {
       res.status(200).json({ groups: user.groups });
     } catch (error) {
       res.status(500).json({ message: "Failed to retrieve user's groups", error: error.message });
+    }
+  }),
+
+  updateProfile: asyncHandler(async (req, res) => {
+    const { username, image } = req.body;
+    const userId = req.user.id;
+
+    try {
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { username, image },
+        { new: true, runValidators: true }
+      ).select("-password");
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({
+        message: "Profile updated successfully",
+        user: updatedUser
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update profile", error: error.message });
     }
   }),
 };
