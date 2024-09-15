@@ -181,7 +181,7 @@ const getGroupById = async (id: string): Promise<Group> => {
 
     if (userId) {
       data.isCheckedInToday = data.checkIns.some((checkIn: CheckIn) =>
-        checkIn.user._id === userId && checkIn.date.split('T')[0] === today
+        checkIn.user._id === userId && checkIn.date.split('T')[0] === today && checkIn.confirmed
       );
     } else {
       console.warn('User ID not found');
