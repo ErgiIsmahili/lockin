@@ -26,9 +26,27 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="list"
+          options={{
+            title: 'List',
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name={focused ? 'list-sharp' : 'list-outline'} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="add"
+          options={{
+            title: 'Add',
+            tabBarIcon: ({ color, focused }) => (
+              <TabBarIcon name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="groups"
           options={{
-            title: 'Groups',
+            title: 'Friends',
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon name={focused ? 'people' : 'people-outline'} color={color} />
             ),
