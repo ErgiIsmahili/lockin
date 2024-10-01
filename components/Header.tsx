@@ -5,7 +5,7 @@ import { Image, Text, View, StyleSheet, Platform } from 'react-native';
 const Header = () => {
   return (
     <View style={styles.headerContainer}>
-      <Text style={styles.headerTitle}>Lock In</Text>
+      <Text style={styles.headerTitle}>plate</Text>
     </View>
   );
 };
