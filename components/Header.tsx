@@ -13,7 +13,7 @@ const Header = () => {
 const styles = StyleSheet.create({
   headerContainer: {
     width: '100%',
-    height: 120, 
+    height: 75, 
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f8f8f8', 
@@ -27,10 +27,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 48,
-    color: '#333',
+    color: '#F17F05',
     fontWeight: 'bold',
     position: 'absolute',
-    top: 50,
+    top: 10,
   },
 });
 

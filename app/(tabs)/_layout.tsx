@@ -13,7 +13,11 @@ export default function TabLayout() {
     <ProtectedRoute>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          tabBarActiveTintColor: '#00BFFF', 
+          tabBarInactiveTintColor: '#FFFFFF', 
+          tabBarStyle: {
+            backgroundColor: '#F17F05',
+          },
           headerShown: false,
         }}>
         <Tabs.Screen
